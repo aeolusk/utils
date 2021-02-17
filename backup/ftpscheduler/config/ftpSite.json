@@ -1,0 +1,60 @@
+{
+	"sites": [
+		"testSite",
+		"testSite2"
+	],
+	
+	"testSite": {
+		"hostname" : "localhost",
+		"port" : 22,
+		"sftp" : true,
+		"id" : "ftpuser",
+		"password" : "good1018",
+		"works" : [
+			{
+				"jobType" : "upload",
+				"schedule" : "quartz:30 * * * * ?",
+				"name": "first test upload",
+				"from" : "filePattern:/temp/bono/test/,\\d+\\.\\d+\\.\\d+.txt",
+				"to" : "/FTP Folder/temp/{SIMPLEDATEFORMAT:yyyyMMddYYHHMM}/{SOURCEFILENAME}",
+				"preRule" : "log:start upload to ftp folder.",
+				"postRule" : "move:{UPLOADFILES},/temp/bono/backup/{SOURCEFILENAME}.move"
+			},
+			{
+				"jobType" : "download",
+				"schedule" : "quartz:30 * * * * ?",
+				"name": "first test download",
+				"from" : "file:/remote/test/sample_copy.txt",
+				"to" : "/temp/bono/test/sample.txt",
+				"preRule" : "",
+				"postRule" : "copy:{DOWNLOADFILES},/temp/bono/test/copy/{FILENAME}.copy"
+			}
+		]
+	},
+
+	"testSite2": {
+		"hostname" : "localhost",
+		"id" : "ftpuser",
+		"password" : "encrypt:IvafWDxqmXmz4zVNiJXaoB37HEVzH+y6ml4h3u93uy1XMSU0JglQdLCv7Mtbf24BzNuD3Q==",
+		"works" : [
+			{
+				"jobType" : "upload",
+				"schedule" : "quartz:0,30 * * ? * MON-FRI",
+				"name": "second test upload",
+				"from" : "filePattern:/temp/bono/test/,.+",
+				"to" : "/remote/test/{SOURCEFILENAME}",
+				"preRule" : "log:start upload to ftp folder.",
+				"postRule" : "log:end upload to ftp folder."
+			},
+			{
+				"jobType" : "download",
+				"schedule" : "quartz:0 * * * * ?",
+				"name": "second test download",
+				"from" : "filePattern:/remote/test/,.+",
+				"to" : "/temp/bono/{SOURCEFILENAME}",
+				"preRule" : "log:start download to ftp folder.",
+				"postRule" : "log:end download to ftp folder."
+			}
+		]
+	} 
+}

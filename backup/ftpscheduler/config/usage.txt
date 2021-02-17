@@ -1,0 +1,73 @@
+=====================
+설정파일 구조
+=====================
+{
+	"sites": [ // FTP 작업을 수행할 사이트 alias 명칭을 기술한다.
+		"site1",
+		"site2"
+	],
+	
+	"site1": {
+		"hostname" : "localhost", // host 이름을 지정한다. [mandatory]
+		"port" : 21, // ftp port. [optional]
+		"sftp" : true, // sftp 사용 여부. [optional]
+		"id" : "ftpuser", // ftp 사용자 id
+		// ftp 사용자 password. 암호화 된 문자열 사용시 "encrypt:" 태그를 사용한다.
+		// ex) "encrypt:IvafWDxqmXmz4zVNiJXaoB37HEVzH+y6ml4h3u93uy1XMSU0JglQdLCv7Mtbf24BzNuD3Q=="
+		// 암호화 방법은 PasswordEncoder 클래스의 encode 함수를 사용하면 된다.
+		"password" : "good1018", 
+		"works" : [ // 작업 목록을 기술한다.
+			{
+				"jobType" : "upload", // upload or download
+				"schedule" : "quartz:30 * * * * ?", // quartz:"cron 스케쥴 정책" 
+				"name": "first test upload", // 작업 식별명
+				// 소스 파일 인식 패턴 또는 소스 파일
+				// filePattern:[디렉토리명],[소스파일 인색 패턴]
+				"from" : "filePattern:/temp/bono/test/,\\d+\\.\\d+\\.\\d+.txt",
+				// 소스 파일을 저장할 경로
+				// 아래 "변수 정의"에 기술된 변수 사용 가능
+				"to" : "/FTP Folder/temp/{SIMPLEDATEFORMAT:yyyyMMddYYHHMM}/{SOURCEFILENAME}",
+				// 사전 작업을 지정.
+				// log: 로그를 남긴다.
+				// move: 파일을 이동한다.
+				// delete: 파일을 삭제한다.
+				"preRule" : "log:start upload to ftp folder.",
+				// 사후 작업을 지정.
+				// log: 로그를 남긴다.
+				// move: 파일을 이동한다.
+				// delete: 파일을 삭제한다.
+				"postRule" : "move:{UPLOADFILES},/temp/bono/backup/{SOURCEFILENAME}.move"
+			},
+			{
+				"jobType" : "download",
+				"schedule" : "quartz:30 * * * * ?",
+				"name": "first test download",
+				"from" : "file:/remote/test/sample_copy.txt",
+				"to" : "/temp/bono/test/sample.txt",
+				"preRule" : "",
+				"postRule" : "copy:{DOWNLOADFILES},/temp/bono/test/copy/{FILENAME}.copy"
+			}
+		]
+	},
+	"site2": {
+	    ...
+	 }
+}
+
+
+=====================
+변수 정의
+=====================
+{SOURCEFILEPATH} // FTP upload, download 시 from쪽 파일경로, "move:..." 등 작업의 source 경로
+{SOURCEFILENAME} // FTP upload, download 시 from쪽 파일명 (경로 제외), "move:..." 등 작업의 source 파일명
+
+{FILENAME} // {UPLOADFILES}, {DOWNLOADFILES} 와 함께 사용. 파일명
+{FILEPATH} // {UPLOADFILES}, {DOWNLOADFILES} 와 함께 사용. 파일명(경로포함)
+
+{UPLOADFILES} // upload 파일 목록
+{DOWNLOADFILES} // download 파일 목록
+
+
+{FILES:directory,pattern} 
+	// 지정한 디렉토리의 파일 목록(pattern을 지정하지 않으면 해당 디렉토리 전체 파일)
+	// "delete:" 키워드 사용시 활용 됨
