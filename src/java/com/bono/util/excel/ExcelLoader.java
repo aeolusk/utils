@@ -36,16 +36,17 @@ public class ExcelLoader {
 		}
 		return null;
 	}
-	
+
 	public static <T> List<T> loadDataOnSheet(XSSFSheet sheet, Class<?> modelClass, ColumnLineInfo columnLineInfo)
 			throws InvalidFormatException, InstantiationException, IllegalAccessException {
 		SheetAnalysisModel analysisModel = ExcelSheet2Class.extractAnalysisModel(modelClass, columnLineInfo);
 		List<T> alarmConfigs = ExcelSheet2Class.parseSheet(analysisModel, sheet);
 
-		for (T alarmConfig : alarmConfigs) {
-			System.out.println(alarmConfig);
-		}
+		// for debugging.
+		// for (T alarmConfig : alarmConfigs) {
+		// 	System.out.println(alarmConfig);
+		// }
 		return alarmConfigs;
 	}
-	
+
 }
