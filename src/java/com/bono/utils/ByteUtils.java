@@ -1,7 +1,78 @@
 package com.bono.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
+
 public class ByteUtils {
 	private static final int TRACE_LINE_BREAK_LIMIT = 64;
+
+	public static byte[] message2byte(Serializable obj) throws IOException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try (ObjectOutput out = new ObjectOutputStream(bos)) {
+			out.writeObject(obj);
+			return bos.toByteArray();
+		}
+	}
+
+	public static Serializable byte2message(byte[] body) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream bis = new ByteArrayInputStream(body);
+		try (ObjectInput in = new ObjectInputStream(bis)) {
+			return (Serializable) in.readObject();
+		}
+	}
+
+	public static byte[] compress(byte[] data) {
+		Deflater deflater = new Deflater();
+		deflater.setLevel(Deflater.BEST_COMPRESSION);
+		deflater.setInput(data);
+		deflater.finish();
+
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length)) {
+			byte[] buffer = new byte[1024];
+
+			while (!deflater.finished()) {
+				int count = deflater.deflate(buffer);
+				baos.write(buffer, 0, count);
+			}
+
+			return baos.toByteArray();
+		} catch (IOException e) {
+			// Ignore it. It's not happen.
+			return null;
+		}
+	}
+
+	public static byte[] decompress(byte[] data) throws DataFormatException {
+		Inflater inflater = new Inflater();
+		inflater.setInput(data);
+
+		byte[] buffer = new byte[1024];
+
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length)) {
+			while (!inflater.finished()) {
+				try {
+					int count = inflater.inflate(buffer);
+					baos.write(buffer, 0, count);
+				} catch (DataFormatException e) {
+					throw e;
+				}
+			}
+
+			return baos.toByteArray();
+		} catch (IOException e) {
+			// Ignore it. It's not happen.
+			return null;
+		}
+	}
 
 	public static void trace(byte[] data) {
 		if (data == null)
