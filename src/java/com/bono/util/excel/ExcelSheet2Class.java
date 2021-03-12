@@ -75,6 +75,9 @@ public class ExcelSheet2Class {
 				ColumnAnalysisModel columnAnalysisModel = analysisModel.getColumnAnalysisModels(field.getName());
 				XSSFCell cell = row.getCell(columnAnalysisModel.getColumnIndex());
 
+				if (cell == null)
+					continue;
+
 				if (field.getType().isAssignableFrom(String.class)) {
 					field.set(instance, ExcelUtils.cell2String(cell));
 				} else if (field.getType().isAssignableFrom(Double.class)) {
