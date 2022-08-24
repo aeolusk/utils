@@ -78,5 +78,11 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.ow2.jonas.assemblies/client-jar -->
+		<dependency>
+			<groupId>org.ow2.jonas.assemblies</groupId>
+			<artifactId>client-jar</artifactId>
+			<version>5.3.0</version>
+		</dependency>
 	</dependencies>
 </project>
