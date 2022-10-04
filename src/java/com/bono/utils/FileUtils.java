@@ -11,14 +11,26 @@ public class FileUtils {
 		if (directory == null || directory.length() == 0)
 			return directory;
 
-		char lastChar = directory.charAt(directory.length() - 1); 
-		if(lastChar == '\\' || lastChar == '/')
+		char lastChar = directory.charAt(directory.length() - 1);
+		if (lastChar == '\\' || lastChar == '/')
 			return directory;
 
-		return directory + File.separator;
+		return directory + "/";
 	}
+
+	public static String getUnixPath(String path) {
+		if (path == null)
+			return null;
+
+		return path.replace('\\', '/');
+	}
+
+	public static String getPath(String filePath) {
+		return getDirectory(filePath);
+	}
+
 	public static String getDirectory(String filePath) {
-		if (filePath == null || filePath.length() == 0)
+		if (filePath == null)
 			return null;
 
 		int delimeter = filePath.lastIndexOf("/");
@@ -29,7 +41,7 @@ public class FileUtils {
 		if (delimeter > 0)
 			return filePath.substring(0, delimeter + 1);
 
-		return "";
+		return filePath;
 	}
 
 	public static String getFilename(String filePath) {
@@ -45,6 +57,12 @@ public class FileUtils {
 			return filePath.substring(delimeter + 1, filePath.length());
 
 		return filePath;
+	}
+
+	public static File getParentIfExist(File file) {
+		if (file.getParentFile() == null)
+			return file;
+		return file.getParentFile();
 	}
 
 	public static String getParentDirectory(String directoryPath) {
@@ -73,6 +91,9 @@ public class FileUtils {
 	}
 
 	public static boolean makeDirectory(File directoryPath) {
+		if (directoryPath == null)
+			return true;
+
 		if (directoryPath.exists()) {
 			if (directoryPath.isDirectory())
 				return true;
@@ -91,7 +112,7 @@ public class FileUtils {
 		List<File> files = new ArrayList<>();
 
 		if (path == null || !path.isDirectory())
-			throw new IOException(path + "isn't directory.");
+			throw new IOException(path + " isn't directory(or isn't exist).");
 
 		for (File file : path.listFiles()) {
 			if (file.isFile()) {

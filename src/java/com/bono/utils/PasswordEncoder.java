@@ -9,6 +9,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
+import com.bono.struct.Class2Struct;
+
 public class PasswordEncoder {
 	public static final String commonPasswordKey = "TotalWingsSecureVersion1.0";
 	
@@ -42,7 +44,7 @@ public class PasswordEncoder {
 		byte[] cipherText = cipher.doFinal(pText);
 
 		// prefix IV and Salt to cipher text
-		byte[] cipherTextWithIvSalt = ByteBuffer.allocate(iv.length + salt.length + cipherText.length).put(iv).put(salt)
+		byte[] cipherTextWithIvSalt = Class2Struct.buildByteBuffer(iv.length + salt.length + cipherText.length).put(iv).put(salt)
 				.put(cipherText).array();
 
 		// string representation, base64, send this string to other for decryption.
